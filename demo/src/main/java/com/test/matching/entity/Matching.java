@@ -10,4 +10,5 @@ public class Matching {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // DB에서 auto_increment 사용 시
     private Long id;
+    dasdas
 }
