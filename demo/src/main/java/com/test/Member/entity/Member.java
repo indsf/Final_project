@@ -52,10 +52,14 @@ public class Member extends BaseEntity {
     @Column(name = "is_black_listed")
     private Boolean isBlackListed = false;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "member_role")
+    private MemberRole memberRole;
+
     @Builder
     public Member(String name, String nickname, String profileImageUrl, String email,
                   Integer age, DisabilityType disabilityType, Gender gender,
-                  Role role, String password) {
+                  Role role, MemberRole memberRole, String password) {
         this.name = name;
         this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
@@ -64,15 +68,16 @@ public class Member extends BaseEntity {
         this.disabilityType = disabilityType;
         this.gender = gender;
         this.role = role;
+        this.memberRole = memberRole; // 추가
         this.password = password;
     }
-
     public void updateMember(NaverJoinDto joinDto) {
         this.name = joinDto.getName();
         this.nickname = joinDto.getNickname();
         this.gender = joinDto.getGender();
         this.age = joinDto.getAge();
-        this.role = joinDto.getRole();
+        this.role = joinDto.getRole(); // 일반/관리자
+        this.memberRole = joinDto.getMemberRole();
         this.disabilityType = joinDto.getDisabilityType();
     }
 
@@ -85,6 +90,7 @@ public class Member extends BaseEntity {
                 .gender(joinDto.getGender())
                 .age(joinDto.getAge())
                 .role(joinDto.getRole())
+                .memberRole(joinDto.getMemberRole())
                 .disabilityType(joinDto.getDisabilityType())
                 .build();
     }

@@ -3,6 +3,7 @@ package com.test.Member.dto;
 import com.test.Member.entity.DisabilityType;
 import com.test.Member.entity.Gender;
 import com.test.Member.entity.Role;
+import com.test.Member.entity.MemberRole; // 새로 추가
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -32,8 +33,11 @@ public class NaverJoinDto {
     @NotNull(message = "나이를 입력해주세요")
     private Integer age;
 
-    @NotNull(message = "회원 역할을 선택해주세요")
-    private Role Role;
+    @NotNull(message = "회원 유형을 선택해주세요")
+    private MemberRole memberRole; // GIVER / TAKER
+
+    @NotNull(message = "권한을 선택해주세요")
+    private Role role; // USER / ADMIN
 
     @NotNull(message = "장애 유형을 선택해주세요")
     private DisabilityType disabilityType;

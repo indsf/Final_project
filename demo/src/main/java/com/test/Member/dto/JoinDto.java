@@ -3,6 +3,7 @@ package com.test.Member.dto;
 
 import com.test.Member.entity.DisabilityType;
 import com.test.Member.entity.Gender;
+import com.test.Member.entity.MemberRole;
 import com.test.Member.entity.Role;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -38,4 +39,7 @@ public class JoinDto {
 
     @NotNull(message = "장애 유형을 선택해주세요")
     private DisabilityType disabilityType;
+
+    @NotNull(message = "회원 역할을 선택해주세요")
+    private MemberRole memberRole; // GIVER / TAKER 선택
 }

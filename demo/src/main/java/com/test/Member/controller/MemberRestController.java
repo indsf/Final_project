@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -52,12 +53,24 @@ public class MemberRestController {
             @SessionAttribute(name = "loginUser", required = false) Member loginUser) {
 
         if (loginUser == null) {
-            CustomBody<Member> body = new CustomBody<>(false, null, null);
+            // ErrorResponse.of(status, exception, message) 같은 정적 메서드가 있을 가능성이 큼
+            ErrorResponse error = ErrorResponse.create(
+                    new IllegalStateException("로그인 후 이용 가능합니다."),
+                    HttpStatus.UNAUTHORIZED,
+                    "로그인 후 이용 가능합니다."
+            );
+            CustomBody<Member> body = new CustomBody<>(
+                    false,
+                    null,
+                    error
+            );
             return new ApiResponse<>(body, HttpStatus.UNAUTHORIZED);
         }
+
         CustomBody<Member> body = new CustomBody<>(true, loginUser, null);
         return new ApiResponse<>(body, HttpStatus.OK);
     }
+
 
     /** 닉네임 변경 */
     @Operation(summary = "닉네임 변경", description = "회원 ID와 새 닉네임으로 닉네임을 변경합니다.")

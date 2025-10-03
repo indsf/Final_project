@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat Room</title>
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+</head>
+<body>
+<h1>Chat Room</h1>
+<p>Room ID: <span th:text="${roomId}"></span></p>
+<p>Participants: <span th:text="${memberIds}"></span></p>
+
+<input type="text" id="messageInput" placeholder="메시지 입력">
+<button onclick="sendMessage()">보내기</button>
+
+<ul id="chatLog"></ul>
+
+<script>
+  // 서버에서 Thymeleaf로 전달
+  var roomId = /*[[${roomId}]]*/ 0;
+  var memberIds = /*[[${memberIds}]]*/ [];
+  var senderId = /*[[${loginMemberId}]]*/ 0; // 로그인한 유저
+
+  var socket = new SockJS('/ws');
+  var stompClient = Stomp.over(socket);
+
+  stompClient.connect({}, function(frame) {
+      console.log('Connected: ', frame);
+
+      // 채팅방 구독
+      stompClient.subscribe('/topic/chatRoom/' + roomId, function(message) {
+          var msg = JSON.parse(message.body);
+          var li = document.createElement('li');
+          li.textContent = "User " + msg.senderId + ": " + msg.content;
+          document.getElementById('chatLog').appendChild(li);
+      });
+  });
+
+  function sendMessage() {
+      var msg = document.getElementById('messageInput').value;
+      stompClient.send('/app/chat.sendMessage', {}, JSON.stringify({
+          roomId: roomId,
+          senderId: senderId,
+          content: msg
+      }));
+      document.getElementById('messageInput').value = '';
+  }
+</script>
+</body>
+</html>
