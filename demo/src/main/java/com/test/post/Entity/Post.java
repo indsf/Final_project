@@ -5,7 +5,9 @@ import com.test.Member.entity.Gender;
 import com.test.Member.entity.Member;
 import com.test.common.persistance.SoftDeleteEntity;
 import com.test.matching.entity.Matching;
+import com.test.post.dto.PostStatus;
 import com.test.post.dto.PostUpdateReqDto;
+import com.test.post.exception.PostUpdateNotAllowedException;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,7 +29,7 @@ public class Post extends SoftDeleteEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
-    private Member member;
+    private Member author;
 
     private String title;
 
@@ -45,6 +47,10 @@ public class Post extends SoftDeleteEntity {
 
     @Enumerated(EnumType.STRING)
     private PostType postType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PostStatus postStatus;
 
     @Enumerated(EnumType.STRING)
     private Gender gender;
@@ -65,6 +71,12 @@ public class Post extends SoftDeleteEntity {
     private final List<PostLike> postLikes = new ArrayList<>();
 
 
+
+    public void validateUpdateBy(Member author) {
+        if (!this.author.equals(author)) {
+            throw PostUpdateNotAllowedException.EXCEPTION;
+        }
+    }
 
 
     public void updatePost(PostUpdateReqDto postUpdateReqDto){

@@ -13,8 +13,6 @@ public record AssistanceResDto(
         @JsonFormat(pattern = "HH:mm") LocalTime assistanceStartTime,
         @JsonFormat(pattern = "HH:mm") LocalTime assistanceEndTime
 ) {
-
-
     public AssistanceResDto {
     }
 }

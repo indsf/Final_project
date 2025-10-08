@@ -1,20 +1,31 @@
 package com.test.Member.controller;
 
+import com.test.Member.detail.CustomUserDetails;
 import com.test.Member.dto.LoginDto;
 import com.test.Member.dto.NaverJoinDto;
 import com.test.Member.entity.Member;
 import com.test.Member.repository.MemberRepository;
 import com.test.Member.service.MemberService;
 import com.test.Member.service.NaverLoginService;
+import com.test.common.exception.ErrorCodeDetail;
 import com.test.utils.api.ApiResponse;
 import com.test.utils.api.ApiResponse.CustomBody;
+import com.test.utils.api.ApiResponseGenerator;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -25,22 +36,45 @@ import java.util.UUID;
 @Tag(name = "회원 API", description = "회원 관련 REST API")
 public class LoginRestController {
 
+    private final AuthenticationManager authenticationManager;
     private final MemberService memberService;
     private final NaverLoginService naverLoginService;
     private final MemberRepository memberRepository;
 
+
     /** 일반 로그인 */
+    // 시큐리티 이용한 세션 인증
     @Operation(summary = "일반 로그인", description = "이메일과 비밀번호로 로그인합니다.")
     @PostMapping("/login")
     public ApiResponse<CustomBody<Member>> login(
             @Parameter(description = "로그인 정보 DTO") @RequestBody @Valid LoginDto loginDto,
-            HttpSession session) {
+            HttpServletRequest request) {
 
-        Member member = memberService.login(loginDto.getEmail(), loginDto.getPassword());
-        session.setAttribute("loginUser", member);
+        // 로그인 이메일,비번 트큰 생성
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(loginDto.getEmail(),loginDto.getPassword());
 
-        CustomBody<Member> body = new CustomBody<>(true, member, null);
-        return new ApiResponse<>(body, HttpStatus.OK);
+        // 매니저로 검증
+        try {
+            Authentication authentication = authenticationManager.authenticate(authToken);
+            // 인증 성공시 컨텍스트에 저장
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            // 세션에 저장
+            HttpSession session = request.getSession(true);
+            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                    SecurityContextHolder.getContext());
+
+            CustomUserDetails  userDetails = (CustomUserDetails)  authentication.getPrincipal();
+            Member member = userDetails.getMember();
+
+            return ApiResponseGenerator.success(member,HttpStatus.OK);
+        }
+        catch (BadCredentialsException e) {
+            return ApiResponseGenerator.fail(ErrorCodeDetail.INVALID_PASSWORD);
+        } catch (UsernameNotFoundException e) {
+            return ApiResponseGenerator.fail(ErrorCodeDetail.USER_NOT_FOUND);
+        } catch (Exception e) {
+            return ApiResponseGenerator.fail(ErrorCodeDetail.LOGIN_FAILED);
+        }
     }
 
     /** 네이버 로그인 URL 반환 */

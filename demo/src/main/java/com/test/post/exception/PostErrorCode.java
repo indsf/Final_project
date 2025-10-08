@@ -1,10 +1,9 @@
 package com.test.post.exception;
 
-import ch.qos.logback.core.spi.ErrorCodes;
-import com.test.common.exception.ErrorStatus;
+import com.test.common.exception.ErrorCode;
 import org.springframework.http.HttpStatus;
 
-public enum PostErrorCode implements ErrorStatus {
+public enum PostErrorCode implements ErrorCode {
 
     POST_NOT_FOUND("ERROR1", HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다."),
     POST_DELETE_NOT_ALLOWED("P002", HttpStatus.FORBIDDEN, "본인의 게시글만 삭제할 수 있습니다."),
@@ -28,16 +27,21 @@ public enum PostErrorCode implements ErrorStatus {
 
     @Override
     public HttpStatus HttpStatus() {
-        return null;
+        return httpStatus;
     }
 
     @Override
     public String getMessage() {
+        return message;
+    }
+
+    @Override
+    public HttpStatus getHttpStatus() {
         return null;
     }
 
     @Override
     public String getCode() {
-        return null;
+        return code;
     }
 }

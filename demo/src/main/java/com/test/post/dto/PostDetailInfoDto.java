@@ -1,22 +1,23 @@
 package com.test.post.dto;
 
-import com.test.Member.entity.DisabilityType;
 import com.test.post.Entity.Collage;
 import com.test.post.Entity.PostType;
 import lombok.Builder;
 
-// 여러 게시글 보여주는데
+import java.time.LocalDateTime;
+
+
 @Builder
-public record PostListItemDto(
+public record PostDetailInfoDto(
         Long id,
         String title,
+        ScheduleDetailResDto schedule,
         Collage collage,
+        String content,
         PostType postType,
-        DisabilityType disabilityType,
+        LocalDateTime createdAt,
         AssistanceResDto assistance,
         PostStatus postStatus,
-        ScheduleListResDto schedule,
         Boolean isLiked
 ) {
-
 }

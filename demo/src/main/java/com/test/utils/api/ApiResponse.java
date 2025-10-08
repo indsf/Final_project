@@ -4,6 +4,7 @@ package com.test.utils.api;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 // 롬복: 모든 필드를 파라미터로 받는 생성자를 자동 생성
+import com.test.common.exception.ErrorResponse;
 import lombok.AllArgsConstructor;
 // 롬복: 모든 필드에 대해 getter 자동 생성
 import lombok.Getter;
@@ -14,7 +15,6 @@ import org.springframework.http.MediaType;
 // 스프링에서 제공하는 응답 객체, HTTP 응답 전체(헤더, 바디, 상태코드)를 담을 수 있음
 import org.springframework.http.ResponseEntity;
 // 스프링 6에서 제공하는 표준 에러 응답 인터페이스
-import org.springframework.web.ErrorResponse;
 
 import java.io.Serializable;
 
@@ -46,5 +46,6 @@ public class ApiResponse<B> extends ResponseEntity<B> { // ResponseEntity를 상
         private Boolean success;     // 요청 성공 여부 (true/false)
         private D data;              // 성공 시 내려줄 데이터 (제네릭으로 유연하게)
         private ErrorResponse error; // 실패 시 내려줄 에러 응답
+
     }
 }

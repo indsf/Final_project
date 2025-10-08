@@ -11,6 +11,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.PARAMETER) // 파라미터에서 체크
 @Retention(RetentionPolicy.RUNTIME) // 런타임 실행될때
 public @interface MemberTokenId {
-    boolean supportCheck() default true;
-    Role[] allowCheckValidRole() default {Role.ADMIN,Role.USER};
+    boolean required() default true;
+    Role[] allowedRoles() default {Role.ADMIN,Role.USER};
 }

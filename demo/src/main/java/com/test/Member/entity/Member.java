@@ -80,20 +80,6 @@ public class Member extends BaseEntity {
         this.memberRole = joinDto.getMemberRole();
         this.disabilityType = joinDto.getDisabilityType();
     }
-
-    public static Member createMember(JoinDto joinDto) {
-        return Member.builder()
-                .name(joinDto.getName())
-                .nickname(joinDto.getNickname())
-                .email(joinDto.getEmail())
-                .password(joinDto.getPassword())
-                .gender(joinDto.getGender())
-                .age(joinDto.getAge())
-                .role(joinDto.getRole())
-                .memberRole(joinDto.getMemberRole())
-                .disabilityType(joinDto.getDisabilityType())
-                .build();
-    }
     public void updateMember(String nickname,String disabilityType){
         this.nickname = nickname;
         this.disabilityType = DisabilityType.disFromValue(disabilityType);

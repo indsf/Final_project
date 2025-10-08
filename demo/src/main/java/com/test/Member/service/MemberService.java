@@ -3,9 +3,11 @@ package com.test.Member.service;
 import com.test.Member.dto.JoinDto;
 import com.test.Member.entity.Member;
 import com.test.Member.exception.MemberErrorCode;
+import com.test.Member.mapper.MemberMapper;
 import com.test.Member.repository.MemberRepository;
 import com.test.common.exception.BussinessException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
     /** 회원가입 후 Member 반환 */
     @Transactional
@@ -20,20 +23,22 @@ public class MemberService {
         if (memberRepository.existsByEmail(joinDto.getEmail())) {
             throw new BussinessException(MemberErrorCode.MEMBER_EMAIL_ALREADY_EXISTS);
         }
+
+        String encodedPassword = passwordEncoder.encode(joinDto.getPassword());
         if (memberRepository.existsByNickname(joinDto.getNickname())) {
             throw new BussinessException(MemberErrorCode.MEMBER_NICKNAME_ALREADY_EXISTS);
         }
 
-        Member member = Member.createMember(joinDto);
+        Member member = MemberMapper.createMember(joinDto,encodedPassword);
         return memberRepository.saveAndFlush(member);
     }
 
     /** 로그인 후 Member 반환 */
     public Member login(String email, String password) {
         Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이메일입니다."));
+                .orElseThrow(() -> new BussinessException(MemberErrorCode.INVALID_PASSWORD_OR_EMAIL));
         if (!member.getPassword().equals(password)) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new BussinessException(MemberErrorCode.INVALID_PASSWORD_OR_EMAIL);
         }
         return member;
     }
@@ -47,11 +52,12 @@ public class MemberService {
 
     public Member updateNickname(String oldNickname, String newNickname) {
         Member member = memberRepository.findByNickname(oldNickname)
-                .orElseThrow(() -> new IllegalArgumentException("해당 닉네임의 회원이 존재하지 않습니다."));
+                .orElseThrow(() -> new BussinessException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         member.setNickname(newNickname);
         return memberRepository.save(member);
     }
+
 
 
     public String findEmailByPassword(String password) {
