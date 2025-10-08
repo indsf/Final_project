@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -48,6 +49,7 @@ public class MemberRestController {
     @Operation(summary = "프로필 조회", description = "로그인한 회원의 프로필 정보를 조회합니다.")
     @GetMapping("/profile")
     public ApiResponse<CustomBody<Member>> profile(
+
             @Parameter(description = "세션에 저장된 로그인 사용자")
             @SessionAttribute(name = "loginUser", required = false) Member loginUser) {
 

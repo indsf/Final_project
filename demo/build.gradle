@@ -41,7 +41,14 @@ dependencies {
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
 
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	// JPA와 H2 데이터베이스
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	runtimeOnly 'com.h2database:h2'
+
+// Spring Security 라이브러리
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+// thymeleaf 템플릿 엔진과 Spring Security를 호환해주는 라이브러리
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.1.RELEASE'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 
 	compileOnly 'org.projectlombok:lombok'
@@ -49,6 +56,7 @@ dependencies {
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
 }
 
 

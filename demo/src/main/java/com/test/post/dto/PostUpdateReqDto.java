@@ -1,5 +1,6 @@
 package com.test.post.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.test.common.validation.EnumTypeValue;
 import com.test.post.Entity.AssistanceType;
 import com.test.post.Entity.Collage;
@@ -50,30 +51,44 @@ public record PostUpdateReqDto(
         String postType,
 
         @NotNull(message = "봉사 시작 시간을 입력해주세용")
+        @JsonFormat(pattern = "HH:mm:ss")
         LocalTime assistanceStartTime,
 
         @NotNull(message = "봉사 종료 시간을 입력해주세용")
+        @JsonFormat(pattern = "HH:mm:ss")
         LocalTime assistanceEndTime
 )
 {
 
-    @AssertTrue(message = "시작 날짜는 현 시간이후 선택가능합니당")
-    private boolean isStartDateValidCheck(){
-        LocalDate startLocalDate = startDate.toLocalDate(); //날짜만 꺼내기
-        LocalDate nowLocalDate = LocalDate.now(); // 현재 시간
-        return !startLocalDate.isBefore(nowLocalDate); // 현재 날짜보다 전인지 check
+    // 1) 시작은 현재 시각 이후
+    @AssertTrue(message = "시작 일시(startDate)는 현재 시각 이후여야 합니다.")
+    public boolean isStartDateValidCheck() {
+        return startDate.isAfter(LocalDateTime.now());
     }
 
-    @AssertTrue(message = "종료일은 시작일 이후여야 해용")
-    private boolean isEndDateValidCheck() {
-        LocalDate startLocalDate = startDate.toLocalDate();
-        LocalDate endLocalDate = endDate.toLocalDate();
-        return !endLocalDate.isBefore(startLocalDate);
+    // 2) 종료일은 시작일과 같거나 이후 (날짜만 비교 유지 시)
+    @AssertTrue(message = "종료일은 시작일과 같거나 이후여야 해용")
+    public boolean isEndDateValidCheck() {
+        return !endDate.toLocalDate().isBefore(startDate.toLocalDate());
     }
 
-    @AssertTrue(message = "봉사 종료 시간은 시작 시간 보다 나중에 와야 합니다.")
-    private boolean isAssistanceTimeValid() {
-        return assistanceEndTime.isAfter(assistanceStartTime);
+    // 3) 종료시간은 시작시간 이후 (같은 날 기준) — 자정 넘김을 허용하지 않는 정책
+    @AssertTrue(message = "봉사 종료 시간은 시작 시간보다 나중이어야 합니다.")
+    public boolean isAssistanceTimeValid() {
+        // 같은 날이라면 endTime > startTime 여야 함
+        if (endDate.toLocalDate().isEqual(startDate.toLocalDate())) {
+            return assistanceEndTime.isAfter(assistanceStartTime);
+        }
+        // 다른 날이면 (다음 날 이상) 시간 역전이어도 OK (자정 넘김 허용)
+        return true;
+    }
+
+    // 4) 전체 시각 비교(선택): startDate+startTime < endDate+endTime 여야 한다
+    @AssertTrue(message = "종료 일시는 시작 일시보다 나중이어야 합니다.")
+    public boolean isTimelineOrderValid() {
+        LocalDateTime startDateTime = startDate.with(assistanceStartTime);
+        LocalDateTime endDateTime = endDate.with(assistanceEndTime);
+        return endDateTime.isAfter(startDateTime);
     }
 }
 

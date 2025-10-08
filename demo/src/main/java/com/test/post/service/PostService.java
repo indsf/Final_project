@@ -6,12 +6,17 @@ import com.test.Member.service.MemberService;
 import com.test.post.Entity.AssistanceType;
 import com.test.post.Entity.Collage;
 import com.test.post.Entity.Post;
-import com.test.post.dto.PostEnumResDto;
-import com.test.post.dto.PostReqDto;
+import com.test.post.Entity.PostType;
+import com.test.post.dto.*;
 import com.test.post.exception.PostIdInvalidCheck;
+import com.test.post.exception.PostNotFoundException;
+import com.test.post.mapper.PostMapper;
 import com.test.post.repository.PostRepository;
-import jakarta.persistence.Enumerated;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,6 +52,9 @@ public class PostService {
                 .build();
     }
 
+
+
+
     // postId없으면  error 반환
     @Transactional(readOnly = true)
     public Post findPostIdOrExe(Long postId){
@@ -54,6 +62,63 @@ public class PostService {
                 .orElseThrow(() -> PostIdInvalidCheck.BUSSINESS_EXCEPTION);
     }
 
+    // 존재하는 포스트인지 확인
+    @Transactional(readOnly = true)
+    public Post findPostByIdOrThrow(Long postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> PostNotFoundException.EXCEPTION);
+    }
+
+    // 해당 postType 조회
+    public List<Post> getPostByType(PostType postType){
+        List<Post> posts=  postRepository.findByPostType(postType);
+        if(posts.isEmpty()) {
+            throw new IllegalArgumentException("해당 유형의 게시글이 없습니다: " + postType);
+        }
+        return posts;
+    }
+
+
+    // 단일 게시글 조회
+    public PostDetailDto findPost(Long postId) {
+        Post post = postRepository.findByIdWithAuthor(postId)
+                .orElseThrow(() -> PostNotFoundException.EXCEPTION);
+
+        Boolean isLiked = false; // 좋아요 여부 로직 필요시 추가
+        PostStatus postStatus = PostStatus.MATCHING; // 상태 계산 필요시 변경
+
+        return PostMapper.toPostDetailDto(post, isLiked, postStatus);
+    }
+
+    // 내가 작성한 게시글 목록 조회
+    public PostCustomPage findPostsMyPage(Long memberId, int page, int size, String sort, PostType postType) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sort).descending());
+        Page<Post> posts = postRepository.findByAuthorIdAndPostType(memberId, postType, pageable);
+
+        List<PostListItemDto> content = posts.stream()
+                .map(post -> PostMapper.toPostListItemDto(post, false, PostStatus.MATCHING))
+                .toList();
+
+        return new PostCustomPage(content, posts.getTotalElements(), posts.isLast());
+    }
+
+
+    @Transactional // 게시글 수정
+    public Long updatePost(Long postId, PostUpdateReqDto postUpdateReqDto, Long memberId) {
+        Post post = findPostByIdWithAuthorOrThrow(postId);
+        Member author = memberService.findMemberIdOrExe(memberId);
+
+        post.validateUpdateBy(author);
+        post.updatePost(postUpdateReqDto);
+
+        return post.getId();
+    }
+
+    @Transactional(readOnly = true)
+    public Post findPostByIdWithAuthorOrThrow(Long postId) {
+        return postRepository.findByIdWithAuthor(postId)
+                .orElseThrow(() -> PostNotFoundException.EXCEPTION);
+    }
 
 
 }

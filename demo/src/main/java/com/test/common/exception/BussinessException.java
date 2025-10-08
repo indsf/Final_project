@@ -1,14 +1,14 @@
 package com.test.common.exception;
 
 public class BussinessException extends RuntimeException {
-    private final ErrorStatus errorCode;
+    private final ErrorCode errorCode;
 
-    public BussinessException(ErrorStatus errorCode) {
+    public BussinessException(ErrorCode errorCode) {
         super(errorCode.getMessage());
         this.errorCode = errorCode;
     }
 
-    public ErrorStatus getErrorCode() {
+    public ErrorCode getErrorCode() {
         return errorCode;
     }
 }

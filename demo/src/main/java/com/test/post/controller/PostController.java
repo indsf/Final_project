@@ -5,6 +5,7 @@ import com.test.auth.resolver.MemberTokenId;
 import com.test.common.annotation.AllowAnonymous;
 import com.test.post.Entity.AssistanceType;
 import com.test.post.Entity.PostType;
+import com.test.post.dto.PostDetailDto;
 import com.test.post.dto.PostEnumResDto;
 import com.test.post.dto.PostReqDto;
 import com.test.post.dto.PostUpdateReqDto;
@@ -24,7 +25,7 @@ import java.util.List;
 
 @RestController // RespApi가 요청 처리 기능처리
 @RequiredArgsConstructor // Notnull final 생성자 자동생성
-@RequestMapping("api/posts")
+@RequestMapping("/api/posts")
 @Tag(name = "게시글 API", description = "게시글 관련 API") // swagger 묶음
 public class PostController {
 
@@ -46,5 +47,27 @@ public class PostController {
     public ApiResponse<ApiResponse.CustomBody<PostEnumResDto>> getPostEnums() {
         PostEnumResDto postEnums = postService.getPostEnums();
         return ApiResponseGenerator.success(postEnums, HttpStatus.OK);
+    }
+
+
+    @Operation(summary = "게시글 조회", description = "게시글을 조회합니다.")
+    @GetMapping("/{post-id}")
+    @AllowAnonymous
+    public ApiResponse<ApiResponse.CustomBody<PostDetailDto>> getPost(
+            @PathVariable("post-id") Long postId
+    ) {
+        PostDetailDto postDetailDto = postService.findPost(postId);
+        return ApiResponseGenerator.success(postDetailDto, HttpStatus.OK);
+    }
+
+    @Operation(summary = "게시글 수정", description = "게시글을 수정합니다.")
+    @PutMapping("/{post-id}")
+    public ApiResponse<ApiResponse.CustomBody<Long>> updatePost(
+            @PathVariable("post-id") Long postId,
+            @Valid @RequestBody PostUpdateReqDto postUpdateReqDto,
+            @Parameter(hidden = true) @MemberTokenId Long memberId
+    ) {
+        Long updatedPostId = postService.updatePost(postId, postUpdateReqDto, memberId);
+        return ApiResponseGenerator.success(updatedPostId, HttpStatus.OK);
     }
 }

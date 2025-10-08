@@ -1,11 +1,13 @@
 package com.test.utils.api;
 
 
+import com.test.common.exception.ErrorCodeDetail;
+import com.test.common.exception.ErrorResponse;
 import lombok.experimental.UtilityClass;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.ErrorResponse;
+
 
 @UtilityClass // Lombok: 클래스의 모든 메서드를 static으로 만들고 인스턴스 생성 불가능하게 함
 public class ApiResponseGenerator {
@@ -26,8 +28,9 @@ public class ApiResponseGenerator {
     }
 
     // 실패 응답 (ErrorResponse 객체로 에러 내려줌)
-    public static ApiResponse<ApiResponse.CustomBody<ErrorResponse>> fail(final ErrorResponse errorResponse, final HttpStatus status) {
-        return new ApiResponse<>(new ApiResponse.CustomBody<>(false, null, errorResponse), status);
+    public static <D> ApiResponse<ApiResponse.CustomBody<D>> fail(ErrorCodeDetail errorCodeDetail) {
+        return new ApiResponse<>(new ApiResponse.CustomBody<>(false, null, new ErrorResponse(errorCodeDetail)),
+                errorCodeDetail.getHttpStatus());
     }
 
     // 실패 응답 (Object를 받아서 ErrorResponse로 캐스팅 → 권장 X, 타입 안전성 떨어짐)
