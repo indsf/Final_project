@@ -63,6 +63,7 @@ public class Post extends SoftDeleteEntity {
     @Embedded
     private AssistanceTime assistanceTime;
 
+
     // orphanRemoval 부모와 연결이 끊기면 자동삭제
 //    @OneToMany(mappedBy = "post",cascade = CascadeType.ALL, orphanRemoval = true)
 //    private final List<Matching> matching = new ArrayList<>();

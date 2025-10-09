@@ -1,76 +1,105 @@
 package com.test.auth.config;
 
-import com.test.Member.detail.CustomUserDetails;
 import com.test.Member.service.CustomUserDetailService;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import org.springframework.boot.web.servlet.server.CookieSameSiteSupplier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+
+import java.util.List;
 
 @Configuration
-@EnableWebSecurity // 시큐리티 활성화 웹 보안 설정 구성
+@EnableWebSecurity
 public class SecurityConfig {
 
-    //생성자 생성 호출시
     private final CustomUserDetailService customUserDetailService;
 
     public SecurityConfig(CustomUserDetailService customUserDetailService) {
         this.customUserDetailService = customUserDetailService;
     }
 
-
+    /**
+     * ✅ React(3000) → Spring(8080) CORS 완전 허용 설정
+     */
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOriginPatterns(List.of("http://localhost:3000"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setExposedHeaders(List.of("Authorization", "Set-Cookie"));
+        config.setAllowCredentials(true); // ✅ 쿠키 전송 허용
+        config.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
+    /**
+     * ✅ SameSite=None + Secure 설정 → React와 쿠키 세션 공유 허용
+     */
+    @Bean
+    public CookieSameSiteSupplier applicationCookieSameSiteSupplier() {
+        return CookieSameSiteSupplier.ofNone(); // SameSite=None
+    }
+
+    /**
+     * ✅ 보안 필터 체인 (세션, CORS, 예외처리, 로그아웃 포함)
+     */
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> {}) // 필요 시 CORS 설정
-                .csrf(csrf -> csrf.disable()) // ✅ CSRF 토큰 끄기
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // 요청 오면 세션 생성
+                // ✅ CORS & CSRF 비활성화
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable())
+
+                // ✅ SecurityContext 자동 저장 + 세션 기반 유지
+                .securityContext(ctx -> ctx
+                        .requireExplicitSave(false) // 🔥 자동 저장 허용 (세션 유지 핵심)
+                        .securityContextRepository(new HttpSessionSecurityContextRepository())
                 )
+
+                // ✅ 세션 정책 : 항상 생성 & 재활용
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+                )
+
+                // ✅ 요청 권한 설정
                 .authorizeHttpRequests(auth -> auth
-                        // Swagger 허용
-                        .requestMatchers("/swagger-ui/**", "/swagger-ui.html",
-                                "/v3/api-docs/**", "/api-docs/json/**").permitAll()
-
-                        // 회원가입/로그인/비번찾기 등은 공개
-                        .requestMatchers("/api/user/login", "/api/user/signup", "/api/user/find-*").permitAll()
-
-                        // 게시글 읽기만 공개, 나머진 인증 필요
-                        .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/posts/**").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/posts/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/posts/**").authenticated()
-
-                        // 프로필/닉네임은 인증 필요
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // ✅ Preflight 허용
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/user/login", "/api/user/signup").permitAll()
                         .requestMatchers("/api/user/profile", "/api/user/nickname").authenticated()
-
-                        // 나머지는 전부 인증
                         .anyRequest().authenticated()
                 )
-                // formLogin 아예 제거 (REST API니까 불필요)
+
+                // ✅ 로그아웃 설정
                 .logout(l -> l
                         .logoutUrl("/api/user/logout")
                         .logoutSuccessHandler((req, res, auth) -> {
                             res.setStatus(HttpServletResponse.SC_OK);
                             res.setContentType("application/json;charset=UTF-8");
-                            res.getWriter().write("{\"success\":true}");
+                            res.getWriter().write("{\"success\":true,\"message\":\"LOGOUT_SUCCESS\"}");
                         })
                         .deleteCookies("JSESSIONID")
                         .invalidateHttpSession(true)
                 )
-                // 인증/권한 예외 JSON으로 반환
+
+                // ✅ 예외 처리 (401 / 403)
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint((req, res, ex) -> {
                             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -87,19 +116,20 @@ public class SecurityConfig {
         return http.build();
     }
 
-
-    // 필터 체인 거친후 메니저한테 권한 위임
-    // 로그인 권한 확인
+    /**
+     * ✅ 로그인 인증 매니저
+     */
     @Bean
-    public AuthenticationManager authenticationManager (HttpSecurity security) throws Exception {
+    public AuthenticationManager authenticationManager(HttpSecurity security) throws Exception {
         AuthenticationManagerBuilder builder = security.getSharedObject(AuthenticationManagerBuilder.class);
-
         builder.userDetailsService(customUserDetailService)
                 .passwordEncoder(passwordEncoder());
-
         return builder.build();
     }
 
+    /**
+     * ✅ 비밀번호 암호화
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

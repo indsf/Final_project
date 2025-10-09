@@ -31,7 +31,7 @@ public class MatchingService {
                 .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
 
 
-        Member postMemberId = post.getMember();        // 게시글 작성자
+        Member postMemberId = post.getAuthor();       // 게시글 작성자
         Member commentMemberId = comment.getMember();  // 댓글 작성자
 
         if (postMemberId.getMemberRole() == commentMemberId.getMemberRole()) {

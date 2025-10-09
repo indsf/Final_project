@@ -56,7 +56,7 @@ public class ChatController {
                 .orElseThrow(() -> new IllegalArgumentException("매칭룸 없음"));
 
         Long roomId = matching.getMatchingId(); // 룸ID
-        Long writerId = matching.getPost().getMember().getId();
+        Long writerId = matching.getPost().getAuthor().getId();
         Long commenterId = matching.getComment().getMember().getId();
 
         List<Long> memberIds = List.of(writerId, commenterId); // 참여 멤버
