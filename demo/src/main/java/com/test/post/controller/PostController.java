@@ -38,7 +38,7 @@ public class PostController {
     public ApiResponse<ApiResponse.CustomBody<Long>> createPost(
             @Valid @RequestBody PostReqDto postReqDto
     ) {
-        Long createdPostId = postService.createPost(postReqDto, postReqDto.memberId());
+        Long createdPostId = postService.createPost(postReqDto);
         return ApiResponseGenerator.success(createdPostId, HttpStatus.CREATED);
     }
 
@@ -60,14 +60,13 @@ public class PostController {
         return ApiResponseGenerator.success(postDetailDto, HttpStatus.OK);
     }
 
-    @Operation(summary = "게시글 수정", description = "게시글을 수정합니다.")
+    @Operation(summary = "게시글 수정", description = "로그인한 사용자가 본인의 게시글을 수정합니다.")
     @PutMapping("/{post-id}")
     public ApiResponse<ApiResponse.CustomBody<Long>> updatePost(
             @PathVariable("post-id") Long postId,
-            @Valid @RequestBody PostUpdateReqDto postUpdateReqDto,
-            @Parameter(hidden = true) @MemberTokenId Long memberId
+            @Valid @RequestBody PostUpdateReqDto postUpdateReqDto
     ) {
-        Long updatedPostId = postService.updatePost(postId, postUpdateReqDto, memberId);
+        Long updatedPostId = postService.updatePost(postId, postUpdateReqDto);
         return ApiResponseGenerator.success(updatedPostId, HttpStatus.OK);
     }
 }

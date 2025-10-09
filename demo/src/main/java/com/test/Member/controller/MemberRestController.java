@@ -1,14 +1,14 @@
 package com.test.Member.controller;
 
-import com.test.Member.detail.CustomUserDetails;
-import com.test.Member.detail.ErrorCodeDetail;
 import com.test.Member.dto.FindDto;
 import com.test.Member.dto.JoinDto;
 import com.test.Member.dto.NickNameDto;
 import com.test.Member.dto.ProfileResDto;
 import com.test.Member.entity.Member;
 import com.test.Member.service.MemberService;
+import com.test.auth.config.SecurityUtils;
 import com.test.common.exception.BussinessException;
+import com.test.common.exception.ErrorCodeDetail;
 import com.test.common.exception.ErrorResponse;
 import com.test.utils.api.ApiError;
 import com.test.utils.api.ApiResponse;
@@ -54,57 +54,25 @@ public class MemberRestController {
         }
     }
 
-    @RestController
-    public class ProfileController {
-
-        /** 프로필 조회 */
-        @Operation(summary = "프로필 조회", description = "현재 로그인한 회원의 닉네임과 이메일을 반환합니다.")
-        @GetMapping("/api/user/profile")
-        public ApiResponse<CustomBody<ProfileResDto>> profile(HttpServletRequest request) {
-
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            HttpSession session = request.getSession(false);
-            System.out.println("🧩 현재 세션 ID: " + (session != null ? session.getId() : "없음"));
-            System.out.println("🧩 쿠키에서 받은 세션: " + request.getHeader("Cookie"));
-
-            // 인증 정보가 없거나 익명 사용자라면
-            if (authentication == null || !authentication.isAuthenticated()
-                    || authentication.getPrincipal().equals("anonymousUser")) {
-
-                ErrorResponse error = new ErrorResponse(ErrorCodeDetail.UNAUTHENTICATED);
-                return new ApiResponse<>(
-                        new CustomBody<>(false, null, error),
-                        HttpStatus.UNAUTHORIZED
-                );
-            }
-
-            Object principal = authentication.getPrincipal();
-            if (principal instanceof CustomUserDetails userDetails) {
-                Member member = userDetails.getMember();
-
-                // ✅ 필요한 필드만 DTO로 변환
-                ProfileResDto dto = new ProfileResDto(member.getNickname(), member.getEmail());
-
-                return new ApiResponse<>(
-                        new CustomBody<>(true, dto, null),
-                        HttpStatus.OK
-                );
-            }
-
-            ErrorResponse invalid = new ErrorResponse(ErrorCodeDetail.INVALID_AUTH_OBJECT);
-            return new ApiResponse<>(
-                    new CustomBody<>(false, null, invalid),
-                    HttpStatus.UNAUTHORIZED
-            );
+    /** 프로필 조회 */
+    @Operation(summary = "프로필 조회", description = "로그인한 회원의 프로필 정보를 조회합니다.")
+    @GetMapping("/profile")
+    public ApiResponse<CustomBody<Member>> profile() {
+        try {
+            Member member = SecurityUtils.getCurrentMember();
+            return ApiResponseGenerator.success(member, HttpStatus.OK);
+        } catch (IllegalStateException e) {
+            return ApiResponseGenerator.fail(ErrorCodeDetail.UNAUTHORIZED);
         }
     }
 
+
     /** 닉네임 변경 */
     @Operation(summary = "닉네임 변경", description = "회원 ID와 새 닉네임으로 닉네임을 변경합니다.")
-    @PostMapping("/nickname")
-    public ResponseEntity<?> updateNickname(@RequestBody @Valid NickNameDto dto) {
+    @PutMapping("/nickname")
+    public ApiResponse<CustomBody<Member>> updateNickname(@RequestBody @Valid NickNameDto dto) {
         Member updated = memberService.updateNickname(dto.getOldNickname(), dto.getNewNickname());
-        return ResponseEntity.ok(updated);
+        return ApiResponseGenerator.success(updated, HttpStatus.OK);
     }
 
     /** 아이디 찾기 */
