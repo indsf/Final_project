@@ -1,8 +1,10 @@
 package com.test.post.service;
 
+import com.test.Member.detail.CustomUserDetails;
 import com.test.Member.entity.DisabilityType;
 import com.test.Member.entity.Member;
 import com.test.Member.service.MemberService;
+import com.test.auth.config.SecurityUtils;
 import com.test.post.Entity.AssistanceType;
 import com.test.post.Entity.Collage;
 import com.test.post.Entity.Post;
@@ -17,18 +19,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 import java.util.List;
+import java.util.Objects;
 
 import static com.test.post.mapper.PostMapper.toEntity;
 
 @RequiredArgsConstructor
 @Service
-
 public class PostService {
 
     private final MemberService memberService;
@@ -38,8 +41,9 @@ public class PostService {
 
     //게시글 생성
     @Transactional
-    public Long createPost(PostReqDto postReqDto,Long memberId) {
-        Member member = memberService.findMemberIdOrExe(memberId);
+    public Long createPost(PostReqDto postReqDto) {
+        //인증 객체 접근 && 로그인한 객체 가져오기
+        Member member = SecurityUtils.getCurrentMember();
         Post post = toEntity(postReqDto, member);
         return postRepository.save(post).getId();
     }
@@ -91,9 +95,10 @@ public class PostService {
     }
 
     // 내가 작성한 게시글 목록 조회
-    public PostCustomPage findPostsMyPage(Long memberId, int page, int size, String sort, PostType postType) {
+    public PostCustomPage findPostsMyPage(int page, int size, String sort, PostType postType) {
+        Member member = SecurityUtils.getCurrentMember();
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort).descending());
-        Page<Post> posts = postRepository.findByAuthorIdAndPostType(memberId, postType, pageable);
+        Page<Post> posts = postRepository.findByAuthorIdAndPostType(member.getId(), postType, pageable);
 
         List<PostListItemDto> content = posts.stream()
                 .map(post -> PostMapper.toPostListItemDto(post, false, PostStatus.MATCHING))
@@ -103,10 +108,11 @@ public class PostService {
     }
 
 
-    @Transactional // 게시글 수정
-    public Long updatePost(Long postId, PostUpdateReqDto postUpdateReqDto, Long memberId) {
+    // 게시글 수정 내가 정보 가져오기
+    @Transactional
+    public Long updatePost(Long postId, PostUpdateReqDto postUpdateReqDto) {
         Post post = findPostByIdWithAuthorOrThrow(postId);
-        Member author = memberService.findMemberIdOrExe(memberId);
+        Member author = SecurityUtils.getCurrentMember(); //  로그인한 사용자
 
         post.validateUpdateBy(author);
         post.updatePost(postUpdateReqDto);
@@ -119,6 +125,4 @@ public class PostService {
         return postRepository.findByIdWithAuthor(postId)
                 .orElseThrow(() -> PostNotFoundException.EXCEPTION);
     }
-
-
 }

@@ -1,0 +1,45 @@
+package com.test.comment.exception;
+
+import com.test.common.exception.ErrorCode;
+import org.springframework.http.HttpStatus;
+
+public enum CommentErrorCode implements ErrorCode {
+    COMMENT_NOT_FOUND("C001", HttpStatus.NOT_FOUND, "존재하지 않는 댓글입니다."),
+    COMMENT_UPDATE_NOT_ALLOWED("C002", HttpStatus.FORBIDDEN, "본인의 댓글만 수정할 수 있습니다."),
+    COMMENT_DELETE_NOT_ALLOWED("C003", HttpStatus.FORBIDDEN, "본인의 댓글만 삭제할 수 있습니다."),
+    COMMENT_INVALID_DIRECTION("C004", HttpStatus.BAD_REQUEST, "올바르지 않은 정렬 방식입니다."),
+    COMMENT_ALREADY_WRITTEN("C005", HttpStatus.BAD_REQUEST, "이미 댓글을 작성했습니다. 댓글은 하나만 작성할 수 있습니다."),
+    COMMENT_SAME_GENDER_ONLY("C006", HttpStatus.BAD_REQUEST, "이성간 댓글을 작성할 수 없습니다."),
+    COMMENT_SELF_NOT_ALLOWED("C007", HttpStatus.BAD_REQUEST, "본인의 글에는 댓글을 작성할 수 없습니다."),
+    COMMENT_NOT_ALLOWED_FINISHED_POST("P009", HttpStatus.FORBIDDEN, "모집완료된 게시글에는 댓글을 작성할 수 없습니다."),
+    ;
+
+    private final String code;
+    private final HttpStatus httpStatus;
+    private final String message;
+
+    CommentErrorCode(String code, HttpStatus httpStatus, String message) {
+        this.code = code;
+        this.httpStatus = httpStatus;
+        this.message = message;
+    }
+    @Override
+    public HttpStatus getHttpStatus() {
+        return httpStatus;
+    }
+
+    @Override
+    public String getCode() {
+        return code;
+    }
+
+    @Override
+    public HttpStatus HttpStatus() {
+        return httpStatus;
+    }
+
+    @Override
+    public String getMessage() {
+        return message;
+    }
+}

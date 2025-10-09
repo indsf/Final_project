@@ -49,10 +49,6 @@ public class Post extends SoftDeleteEntity {
     private PostType postType;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private PostStatus postStatus;
-
-    @Enumerated(EnumType.STRING)
     private Gender gender;
 
     @Enumerated(EnumType.STRING)
@@ -72,8 +68,9 @@ public class Post extends SoftDeleteEntity {
 
 
 
+    //글쓴이가 아닐씨 수정불가
     public void validateUpdateBy(Member author) {
-        if (!this.author.equals(author)) {
+        if (!this.author.getId().equals(author.getId())) {
             throw PostUpdateNotAllowedException.EXCEPTION;
         }
     }

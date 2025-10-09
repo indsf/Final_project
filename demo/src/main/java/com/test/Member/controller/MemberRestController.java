@@ -1,14 +1,19 @@
 package com.test.Member.controller;
 
+import com.test.Member.detail.CustomUserDetails;
 import com.test.Member.dto.FindDto;
 import com.test.Member.dto.JoinDto;
 import com.test.Member.dto.NickNameDto;
 import com.test.Member.entity.Member;
 import com.test.Member.service.MemberService;
+import com.test.auth.config.SecurityUtils;
 import com.test.common.exception.BussinessException;
+import com.test.common.exception.ErrorCodeDetail;
+import com.test.common.exception.ErrorResponse;
 import com.test.utils.api.ApiError;
 import com.test.utils.api.ApiResponse;
 import com.test.utils.api.ApiResponse.CustomBody;
+import com.test.utils.api.ApiResponseGenerator;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,7 +21,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -48,25 +55,22 @@ public class MemberRestController {
     /** 프로필 조회 */
     @Operation(summary = "프로필 조회", description = "로그인한 회원의 프로필 정보를 조회합니다.")
     @GetMapping("/profile")
-    public ApiResponse<CustomBody<Member>> profile(
-
-            @Parameter(description = "세션에 저장된 로그인 사용자")
-            @SessionAttribute(name = "loginUser", required = false) Member loginUser) {
-
-        if (loginUser == null) {
-            CustomBody<Member> body = new CustomBody<>(false, null, null);
-            return new ApiResponse<>(body, HttpStatus.UNAUTHORIZED);
+    public ApiResponse<CustomBody<Member>> profile() {
+        try {
+            Member member = SecurityUtils.getCurrentMember();
+            return ApiResponseGenerator.success(member, HttpStatus.OK);
+        } catch (IllegalStateException e) {
+            return ApiResponseGenerator.fail(ErrorCodeDetail.UNAUTHORIZED);
         }
-        CustomBody<Member> body = new CustomBody<>(true, loginUser, null);
-        return new ApiResponse<>(body, HttpStatus.OK);
     }
+
 
     /** 닉네임 변경 */
     @Operation(summary = "닉네임 변경", description = "회원 ID와 새 닉네임으로 닉네임을 변경합니다.")
-    @PostMapping("/nickname")
-    public ResponseEntity<?> updateNickname(@RequestBody @Valid NickNameDto dto) {
+    @PutMapping("/nickname")
+    public ApiResponse<CustomBody<Member>> updateNickname(@RequestBody @Valid NickNameDto dto) {
         Member updated = memberService.updateNickname(dto.getOldNickname(), dto.getNewNickname());
-        return ResponseEntity.ok(updated);
+        return ApiResponseGenerator.success(updated, HttpStatus.OK);
     }
 
     /** 아이디 찾기 */

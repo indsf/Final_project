@@ -5,8 +5,10 @@ import com.test.Member.entity.Member;
 import com.test.Member.exception.MemberErrorCode;
 import com.test.Member.mapper.MemberMapper;
 import com.test.Member.repository.MemberRepository;
+import com.test.auth.config.SecurityUtils;
 import com.test.common.exception.BussinessException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,11 +53,16 @@ public class MemberService {
     }
 
     public Member updateNickname(String oldNickname, String newNickname) {
-        Member member = memberRepository.findByNickname(oldNickname)
-                .orElseThrow(() -> new BussinessException(MemberErrorCode.MEMBER_NOT_FOUND));
+        Member currentMember = SecurityUtils.getCurrentMember();
 
-        member.setNickname(newNickname);
-        return memberRepository.save(member);
+        // oldNickname이 본인의 닉네임인지 확인
+        if (!currentMember.getNickname().equals(oldNickname)) {
+            throw new AccessDeniedException("본인만 닉네임을 변경할 수 있습니다.");
+        }
+        //닉네임 변경
+        currentMember.setNickname(newNickname);
+        // 업데이트
+        return memberRepository.save(currentMember);
     }
 
 
