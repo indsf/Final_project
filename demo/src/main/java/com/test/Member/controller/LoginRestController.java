@@ -57,27 +57,25 @@ public class LoginRestController {
         try {
             // 매니저로 검증
             Authentication authentication = authenticationManager.authenticate(authToken);
-
             // 인증 성공 시 컨텍스트에 저장
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            // ✅ 세션 생성 및 SecurityContext 저장
+            // 세션 생성 및 SecurityContext 저장
             HttpSession session = request.getSession(true);
             session.setAttribute(
                     HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                     SecurityContextHolder.getContext()
             );
 
-            // ✅ 세션 생성 확인 로그 (이 부분 추가)
-            System.out.println("✅ 로그인 성공 - 세션 ID: " + session.getId());
+            // 세션 생성 확인 로그 (이 부분 추가)
+            System.out.println("로그인 성공 - 세션 ID: " + session.getId());
 
             // 사용자 정보 가져오기
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             Member member = userDetails.getMember();
 
-            // ✅ 세션에 사용자 정보도 저장 (선택, 디버깅용)
+            // 세션에 사용자 정보도 저장 (선택, 디버깅용)
             session.setAttribute("loginMember", member);
-            System.out.println("✅ 세션에 저장된 사용자 이메일: " + member.getEmail());
+            System.out.println(" 세션에 저장된 사용자 이메일: " + member.getEmail());
 
             return ApiResponseGenerator.success(member, HttpStatus.OK);
 
