@@ -19,7 +19,6 @@ public class MemberMapper {
                 .password(encodedPassword)
                 .gender(dto.getGender())
                 .age(dto.getAge())
-                .role(dto.getRole())
                 .disabilityType(dto.getDisabilityType())
                 .build();
     }

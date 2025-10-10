@@ -31,8 +31,6 @@ public class PostController {
 
     private final PostService postService;
 
-
-
     @Operation(summary = "게시글 생성", description = "게시글을 생성합니다.")
     @PostMapping
     public ApiResponse<ApiResponse.CustomBody<Long>> createPost(
