@@ -37,7 +37,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("http://localhost:3000"));
+        config.setAllowedOrigins(List.of("https://localhost:3000"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of("Authorization", "Set-Cookie"));
@@ -63,31 +63,32 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // ✅ CORS & CSRF 비활성화
+                // CORS & CSRF 비활성화
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
 
-                // ✅ SecurityContext 자동 저장 + 세션 기반 유지
+                // SecurityContext 자동 저장 + 세션 기반 유지
                 .securityContext(ctx -> ctx
                         .requireExplicitSave(false) // 🔥 자동 저장 허용 (세션 유지 핵심)
                         .securityContextRepository(new HttpSessionSecurityContextRepository())
                 )
 
-                // ✅ 세션 정책 : 항상 생성 & 재활용
+                // 세션 정책 : 항상 생성 & 재활용
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+                        session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
 
-                // ✅ 요청 권한 설정
+                // 요청 권한 설정
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // ✅ Preflight 허용
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/user/login", "/api/user/signup").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/members/me").authenticated()
                         .requestMatchers("/api/user/profile", "/api/user/nickname").authenticated()
                         .anyRequest().authenticated()
                 )
 
-                // ✅ 로그아웃 설정
+                // 로그아웃 설정
                 .logout(l -> l
                         .logoutUrl("/api/user/logout")
                         .logoutSuccessHandler((req, res, auth) -> {
@@ -99,7 +100,7 @@ public class SecurityConfig {
                         .invalidateHttpSession(true)
                 )
 
-                // ✅ 예외 처리 (401 / 403)
+                // s예외 처리 (401 / 403)
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint((req, res, ex) -> {
                             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -117,18 +118,17 @@ public class SecurityConfig {
     }
 
     /**
-     * ✅ 로그인 인증 매니저
+     * 로그인 인증 매니저
      */
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity security) throws Exception {
         AuthenticationManagerBuilder builder = security.getSharedObject(AuthenticationManagerBuilder.class);
-        builder.userDetailsService(customUserDetailService)
-                .passwordEncoder(passwordEncoder());
+        builder.userDetailsService(customUserDetailService).passwordEncoder(passwordEncoder());
         return builder.build();
     }
 
     /**
-     * ✅ 비밀번호 암호화
+     * 비밀번호 암호화
      */
     @Bean
     public PasswordEncoder passwordEncoder() {

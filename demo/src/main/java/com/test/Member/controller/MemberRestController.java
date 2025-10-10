@@ -1,9 +1,9 @@
 package com.test.Member.controller;
 
+import com.test.Member.detail.CustomUserDetails;
 import com.test.Member.dto.FindDto;
 import com.test.Member.dto.JoinDto;
 import com.test.Member.dto.NickNameDto;
-import com.test.Member.dto.ProfileResDto;
 import com.test.Member.entity.Member;
 import com.test.Member.service.MemberService;
 import com.test.auth.config.SecurityUtils;
@@ -17,8 +17,6 @@ import com.test.utils.api.ApiResponseGenerator;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -108,3 +106,4 @@ public class MemberRestController {
     }
 
 }
+

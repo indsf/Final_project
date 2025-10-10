@@ -9,9 +9,9 @@ import java.util.Arrays;
 @Getter
 public enum AssistanceType implements ValueEnum<String> {
     STUDY("STUDY"),
-    MEAL("식사"),
-    MOVE("이동"),
-    ETC("기타");
+    MEAL("MEAL"),
+    MOVE("MOVE"),
+    ETC("ETC");
 
     private String value;
 
