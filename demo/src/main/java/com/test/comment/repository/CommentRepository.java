@@ -11,7 +11,6 @@ public interface CommentRepository extends JpaRepository<Comment,Long> {
 
     Optional<Comment> findById(Long commentId);
 
-
     // 특정 ID를 가진 댓글을 찾기
     @Query("SELECT c From Comment c JOIN FETCH c.member WHERE c.id = :id")
     Optional<Comment> findByIdWithMember(@Param("id")Long commentId);
