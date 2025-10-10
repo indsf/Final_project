@@ -34,9 +34,6 @@ public class JoinDto {
     @NotNull(message = "나이를 입력해주세요")
     private int age;
 
-    @NotNull(message = "회원 역할을 선택해주세요")
-    private Role role;
-
     @NotNull(message = "장애 유형을 선택해주세요")
     private DisabilityType disabilityType;
 
