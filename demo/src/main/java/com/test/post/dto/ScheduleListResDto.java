@@ -7,9 +7,11 @@ import java.time.LocalDateTime;
 
 @Builder
 public record ScheduleListResDto(
+        String scheduleDetails,
         LocalDateTime startDate,
         LocalDateTime endDate,
         ScheduleType scheduleType
+
 ) {
 
 }

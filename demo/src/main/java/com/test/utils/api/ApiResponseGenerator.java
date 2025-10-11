@@ -42,4 +42,5 @@ public class ApiResponseGenerator {
     public static <D> ApiResponse<ApiResponse.CustomBody<D>> success(final D data, final HttpHeaders headers, final HttpStatus status) {
         return new ApiResponse<>(new ApiResponse.CustomBody<>(true, data, null), headers, status);
     }
+
 }
