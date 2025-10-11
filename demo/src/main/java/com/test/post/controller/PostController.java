@@ -1,10 +1,6 @@
 package com.test.post.controller;
 
-import com.test.Member.entity.DisabilityType;
-import com.test.auth.resolver.MemberTokenId;
 import com.test.common.annotation.AllowAnonymous;
-import com.test.post.Entity.AssistanceType;
-import com.test.post.Entity.PostType;
 import com.test.post.dto.PostDetailDto;
 import com.test.post.dto.PostEnumResDto;
 import com.test.post.dto.PostReqDto;
@@ -13,15 +9,11 @@ import com.test.post.service.PostService;
 import com.test.utils.api.ApiResponse;
 import com.test.utils.api.ApiResponseGenerator;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController // RespApi가 요청 처리 기능처리
 @RequiredArgsConstructor // Notnull final 생성자 자동생성

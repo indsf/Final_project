@@ -1,12 +1,8 @@
 package com.test.post.repository;
 
 
-import com.test.Member.entity.DisabilityType;
-import com.test.post.Entity.AssistanceType;
 import com.test.post.Entity.Post;
 import com.test.post.Entity.PostType;
-import com.test.post.dto.PostCustomPage;
-import com.test.post.dto.PostDetailDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

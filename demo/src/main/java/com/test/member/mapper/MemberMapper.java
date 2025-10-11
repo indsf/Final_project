@@ -1,0 +1,25 @@
+package com.test.member.mapper;
+
+import com.test.member.dto.JoinDto;
+import com.test.member.entity.Member;
+
+
+public class MemberMapper {
+    private MemberMapper(){};
+
+
+    //일반 회원 가입
+    public static Member createMember(JoinDto dto, String encodedPassword) {
+        return Member.builder()
+                .name(dto.getName())
+                .nickname(dto.getNickname())
+                .email(dto.getEmail())
+                .password(encodedPassword)
+                .gender(dto.getGender())
+                .age(dto.getAge())
+                .disabilityType(dto.getDisabilityType())
+                .build();
+    }
+
+
+}

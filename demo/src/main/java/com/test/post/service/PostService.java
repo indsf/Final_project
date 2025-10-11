@@ -1,9 +1,8 @@
 package com.test.post.service;
 
-import com.test.Member.detail.CustomUserDetails;
-import com.test.Member.entity.DisabilityType;
-import com.test.Member.entity.Member;
-import com.test.Member.service.MemberService;
+import com.test.member.entity.DisabilityType;
+import com.test.member.entity.Member;
+import com.test.member.service.MemberService;
 import com.test.auth.config.SecurityUtils;
 import com.test.post.Entity.AssistanceType;
 import com.test.post.Entity.Collage;
@@ -19,14 +18,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Target;
 import java.util.List;
-import java.util.Objects;
 
 import static com.test.post.mapper.PostMapper.toEntity;
 

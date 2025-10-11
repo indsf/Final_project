@@ -1,7 +1,7 @@
 package com.test.post.dto;
 
-import com.test.Member.entity.DisabilityType;
-import com.test.Member.entity.Gender;
+import com.test.member.entity.DisabilityType;
+import com.test.member.entity.Gender;
 import lombok.Builder;
 
 @Builder

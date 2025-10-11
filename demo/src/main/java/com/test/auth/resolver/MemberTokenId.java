@@ -1,7 +1,6 @@
 package com.test.auth.resolver;
 
-import com.test.Member.entity.Role;
-import io.swagger.v3.oas.annotations.Parameter;
+import com.test.member.entity.Role;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
