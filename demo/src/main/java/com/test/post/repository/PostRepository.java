@@ -27,6 +27,9 @@ public interface PostRepository extends JpaRepository<Post,Long>{
     @Query("SELECT p FROM Post p JOIN FETCH p.author WHERE p.id = :postId")
     Optional<Post> findByIdWithAuthor(@Param("postId") Long postId);
 
+    @Query(value = "SELECT post_status FROM post WHERE post_id = :postId", nativeQuery = true)
+    String findPostStatusById(@Param("postId") Long postId);
+
     // 내가 쓴 글 조회 (Spring Data JPA 자동 생성)
     Page<Post> findByAuthorIdAndPostType(Long memberId, PostType postType, Pageable pageable);
 }
