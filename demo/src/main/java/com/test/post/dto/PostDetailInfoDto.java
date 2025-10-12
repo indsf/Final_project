@@ -1,5 +1,10 @@
 package com.test.post.dto;
 
+<<<<<<< HEAD
+=======
+import com.test.Member.entity.DisabilityType;
+import com.test.Member.entity.Gender;
+>>>>>>> develop
 import com.test.post.Entity.Collage;
 import com.test.post.Entity.PostType;
 import lombok.Builder;
@@ -16,7 +21,6 @@ public record PostDetailInfoDto(
         String content,
         PostType postType,
         LocalDateTime createdAt,
-
         AssistanceResDto assistance,
         PostStatus postStatus,
         Boolean isLiked

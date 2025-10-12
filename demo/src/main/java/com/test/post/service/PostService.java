@@ -33,6 +33,7 @@ public class PostService {
     private final PostRepository postRepository;
 
 
+<<<<<<< HEAD
     private static Sort toSort(String key) {
         String k = (key == null) ? "latest" : key;
         return switch (k) {
@@ -45,6 +46,8 @@ public class PostService {
         };
     }
 
+=======
+>>>>>>> develop
     //게시글 생성
     @Transactional
     public Long createPost(PostReqDto postReqDto) {
@@ -63,11 +66,9 @@ public class PostService {
     }
 
 
-
-
     // postId없으면  error 반환
     @Transactional(readOnly = true)
-    public Post findPostIdOrExe(Long postId){
+    public Post findPostIdOrExe(Long postId) {
         return postRepository.findById(postId)
                 .orElseThrow(() -> PostIdInvalidCheck.BUSSINESS_EXCEPTION);
     }
@@ -80,22 +81,23 @@ public class PostService {
     }
 
     // 해당 postType 조회
-    public List<Post> getPostByType(PostType postType){
-        List<Post> posts=  postRepository.findByPostType(postType);
-        if(posts.isEmpty()) {
+    public List<Post> getPostByType(PostType postType) {
+        List<Post> posts = postRepository.findByPostType(postType);
+        if (posts.isEmpty()) {
             throw new IllegalArgumentException("해당 유형의 게시글이 없습니다: " + postType);
         }
         return posts;
     }
 
 
-    // 단일 게시글 조회
-    public PostDetailDto findPost(Long postId) {
+    // 상세 게시물  게시글 조회
+    public PostDetailDto findPost(Long postId, Long viewerId) {
         Post post = postRepository.findByIdWithAuthor(postId)
                 .orElseThrow(() -> PostNotFoundException.EXCEPTION);
 
         Boolean isLiked = false; // 좋아요 여부 로직 필요시 추가
-        PostStatus postStatus = PostStatus.MATCHING; // 상태 계산 필요시 변경
+        PostStatus postStatus = post.getPostStatus();
+        // 상태 계산 필요시 변경
 
         return PostMapper.toPostDetailDto(post, isLiked, postStatus);
     }
@@ -134,4 +136,7 @@ public class PostService {
         return postRepository.findByIdWithAuthor(postId)
                 .orElseThrow(() -> PostNotFoundException.EXCEPTION);
     }
+
+
 }
+

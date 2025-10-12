@@ -2,8 +2,11 @@ package com.test.auth.config;
 
 import com.test.member.detail.CustomUserDetails;
 import com.test.member.entity.Member;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+
+import java.util.Optional;
 
 public class SecurityUtils {
 
@@ -24,5 +27,29 @@ public class SecurityUtils {
         }
 
         throw new IllegalStateException("인증된 사용자 정보를 찾을 수 없습니다.");
+    }
+
+    public static Optional<Member> getCurrentMemberOptional() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || authentication instanceof AnonymousAuthenticationToken) {
+            return Optional.empty();
+        }
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof CustomUserDetails userDetails) {
+            return Optional.ofNullable(userDetails.getMember());
+        }
+        return Optional.empty();
+    }
+
+    /** 익명/널 안전: 현재 사용자 ID(Optional) */
+    public static Optional<Long> currentMemberId() {
+        return getCurrentMemberOptional().map(Member::getId);
+    }
+
+    /** 익명/널 안전: 현재 사용자 ID (없으면 null 반환) */
+    public static Long currentMemberIdOrNull() {
+        return currentMemberId().orElse(null);
     }
 }

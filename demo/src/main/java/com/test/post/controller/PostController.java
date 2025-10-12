@@ -1,5 +1,12 @@
 package com.test.post.controller;
 
+<<<<<<< HEAD
+=======
+import com.test.Member.entity.DisabilityType;
+import com.test.Member.entity.Member;
+import com.test.auth.config.SecurityUtils;
+import com.test.auth.resolver.MemberTokenId;
+>>>>>>> develop
 import com.test.common.annotation.AllowAnonymous;
 import com.test.post.dto.PostDetailDto;
 import com.test.post.dto.PostEnumResDto;
@@ -40,14 +47,14 @@ public class PostController {
     }
 
 
-    @Operation(summary = "게시글 조회", description = "게시글을 조회합니다.")
+    @Operation(summary = "게시글 조회", description = "게시글을 상세 조회합니다.")
     @GetMapping("/{post-id}")
     @AllowAnonymous
-    public ApiResponse<ApiResponse.CustomBody<PostDetailDto>> getPost(
+    public ApiResponse<ApiResponse.CustomBody<PostDetailDto>> getPostDetail(
             @PathVariable("post-id") Long postId
     ) {
-        PostDetailDto postDetailDto = postService.findPost(postId);
-        return ApiResponseGenerator.success(postDetailDto, HttpStatus.OK);
+        Long viewerId = SecurityUtils.currentMemberId().orElse(null);
+        return ApiResponseGenerator.success(postService.findPost(postId, viewerId), HttpStatus.OK);
     }
 
     @Operation(summary = "게시글 수정", description = "로그인한 사용자가 본인의 게시글을 수정합니다.")

@@ -2,6 +2,7 @@ package com.test.comment.controller;
 
 import com.test.comment.dto.CommentCustomPage;
 import com.test.comment.dto.CommentReqDto;
+import com.test.comment.dto.CommentResponseDto;
 import com.test.comment.service.CommentService;
 import com.test.post.service.PostService;
 import com.test.utils.api.ApiResponse;
@@ -11,10 +12,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Controller
@@ -33,5 +33,10 @@ public class CommentController {
         return ApiResponseGenerator.success(commentId,HttpStatus.CREATED);
     }
 
+    @GetMapping("/post/{postId}")
+    public ApiResponse<?> getCommentsByPost(@PathVariable("postId") Long postId) {
+        List<CommentResponseDto> comments = commentService.getCommentsByPost(postId);
+        return ApiResponseGenerator.success(comments, HttpStatus.OK);
+    }
 
 }
