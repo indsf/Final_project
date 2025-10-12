@@ -39,4 +39,7 @@ public class JoinDto {
 
     @NotNull(message = "회원 역할을 선택해주세요")
     private MemberRole memberRole; // GIVER / TAKER 선택
+
+    @NotNull
+    private Role role;
 }

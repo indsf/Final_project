@@ -67,7 +67,9 @@ public class Post extends SoftDeleteEntity {
     @OneToMany(mappedBy = "post", orphanRemoval = true, cascade = CascadeType.ALL)
     private final List<PostLike> postLikes = new ArrayList<>();
 
-
+    @Enumerated(EnumType.STRING)
+    @Column(name = "post_status")
+    private PostStatus postStatus;
 
     //글쓴이가 아닐씨 수정불가
     public void validateUpdateBy(Member author) {

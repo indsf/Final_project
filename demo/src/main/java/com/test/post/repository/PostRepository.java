@@ -24,9 +24,15 @@ public interface PostRepository extends JpaRepository<Post,Long>{
     List<Post> findByPostType(PostType postType);
 
     // 작성자(author)와 함께 단일 게시글 조회
-    @Query("SELECT p FROM Post p JOIN FETCH p.author WHERE p.id = :postId")
+    @Query("""
+    select p
+    from Post p
+    join fetch p.author
+    where p.id = :postId
+""")
     Optional<Post> findByIdWithAuthor(@Param("postId") Long postId);
 
+    // postStatus 확인
     @Query(value = "SELECT post_status FROM post WHERE post_id = :postId", nativeQuery = true)
     String findPostStatusById(@Param("postId") Long postId);
 

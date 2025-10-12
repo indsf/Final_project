@@ -4,6 +4,7 @@ import com.test.Member.entity.Member;
 import com.test.Member.service.MemberService;
 import com.test.auth.config.SecurityUtils;
 import com.test.comment.dto.CommentReqDto;
+import com.test.comment.dto.CommentResponseDto;
 import com.test.comment.entity.Comment;
 import com.test.comment.repository.CommentRepository;
 import com.test.post.Entity.Post;
@@ -11,6 +12,8 @@ import com.test.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -28,8 +31,6 @@ public class CommentService {
         Member currentMember = SecurityUtils.getCurrentMember();
         Post post = postService.findPostByIdOrThrow(postId);
 
-        // 규칙 검사 체크 및 확인
-        post.validateUpdateBy(currentMember);
         Comment comment = Comment.builder()
                 .content(commentReqDto.content())
                 .post(post)
@@ -46,6 +47,12 @@ public class CommentService {
                 .build();
     }
 
+    public List<CommentResponseDto> getCommentsByPost(Long postId) {
+        List<Comment> comments = commentRepository.findByPostId(postId);
+        return comments.stream()
+                .map(CommentResponseDto::new)
+                .toList();
+    }
 
 
 }
