@@ -2,6 +2,8 @@ package com.test.Member.mapper;
 
 import com.test.Member.dto.JoinDto;
 import com.test.Member.entity.Member;
+import com.test.Member.entity.MemberRole;
+import com.test.Member.entity.Role;
 import com.test.Member.repository.MemberRepository;
 
 
@@ -20,6 +22,8 @@ public class MemberMapper {
                 .gender(dto.getGender())
                 .age(dto.getAge())
                 .disabilityType(dto.getDisabilityType())
+                .memberRole(dto.getMemberRole())
+                .role(dto.getRole())
                 .build();
     }
 

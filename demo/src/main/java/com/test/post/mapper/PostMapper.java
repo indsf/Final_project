@@ -37,7 +37,7 @@ public final class PostMapper {
 
 
 
-    // Response : 단일 게시글(게시글 상세)
+    // Response : 단일 게시글(게시글 상세) -> 이거 사용해야함
     public static PostDetailDto toPostDetailDto(Post post, Boolean isLiked, PostStatus postStatus) {
         return new PostDetailDto(
                 toPostAuthorDto(post), //작성자 정보
