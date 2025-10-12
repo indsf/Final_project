@@ -1,6 +1,6 @@
 package com.test.post.Entity;
 
-import com.test.Member.entity.Member;
+import com.test.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

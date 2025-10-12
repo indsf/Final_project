@@ -1,7 +1,6 @@
 package com.test.post.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.test.Member.entity.DisabilityType;
 import com.test.common.validation.EnumTypeValue;
 import com.test.post.Entity.AssistanceType;
 import com.test.post.Entity.Collage;

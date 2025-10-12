@@ -1,6 +1,5 @@
 package com.test.auth.resolver;
 
-import com.test.Member.service.MemberService;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;

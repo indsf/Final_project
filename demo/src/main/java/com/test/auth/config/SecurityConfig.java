@@ -1,6 +1,6 @@
 package com.test.auth.config;
 
-import com.test.Member.service.CustomUserDetailService;
+import com.test.member.service.CustomUserDetailService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.boot.web.servlet.server.CookieSameSiteSupplier;
 import org.springframework.context.annotation.Bean;

@@ -1,7 +1,7 @@
 package com.test.comment.service;
 
-import com.test.Member.entity.Member;
-import com.test.Member.service.MemberService;
+import com.test.member.entity.Member;
+import com.test.member.service.MemberService;
 import com.test.auth.config.SecurityUtils;
 import com.test.comment.dto.CommentReqDto;
 import com.test.comment.dto.CommentResponseDto;
