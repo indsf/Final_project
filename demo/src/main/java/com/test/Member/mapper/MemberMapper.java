@@ -2,9 +2,6 @@ package com.test.Member.mapper;
 
 import com.test.Member.dto.JoinDto;
 import com.test.Member.entity.Member;
-import com.test.Member.entity.MemberRole;
-import com.test.Member.entity.Role;
-import com.test.Member.repository.MemberRepository;
 
 
 
