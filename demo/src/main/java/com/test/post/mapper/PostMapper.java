@@ -28,6 +28,7 @@ public final class PostMapper {
                 .disabilityType(DisabilityType.disFromValue(request.disabilityType()))
                 .gender(author.getGender())
                 .age(author.getAge())
+                .postStatus(PostStatus.MATCHING)
                 .assistanceTime(AssistanceTime.builder()
                         .AssistanceStartTime(request.assistanceStartTime())
                         .AssistanceEndTime(request.assistanceEndTime())

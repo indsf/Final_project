@@ -32,12 +32,16 @@ public class SecurityConfig {
     }
 
     /**
-     * ✅ React(3000) → Spring(8080) CORS 완전 허용 설정
+     * ✅ React(3000) → Spring(8443) CORS 완전 허용 설정
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("https://localhost:3000"));
+        // 🔸 여기 한 줄만 추가: LAN에서 접근하는 프론트 오리진 허용
+        config.setAllowedOrigins(List.of(
+                "https://localhost:3000",
+                "https://10.143.3.131:3000"   // ← 추가
+        ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of("Authorization", "Set-Cookie"));
