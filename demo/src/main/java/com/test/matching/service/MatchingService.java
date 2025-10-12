@@ -1,13 +1,11 @@
 package com.test.matching.service;
 
-import com.test.Member.entity.Member;
-import com.test.Member.entity.MemberRole;
+import com.test.member.entity.Member;
 import com.test.matching.entity.Matching;
 import com.test.matching.entity.MatchingStatus;
 import com.test.matching.repository.MatchingRepository;
 import com.test.post.Entity.Post;
 import com.test.comment.entity.Comment;
-import com.test.post.Entity.PostType;
 import com.test.post.repository.PostRepository;
 import com.test.comment.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;

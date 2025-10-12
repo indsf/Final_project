@@ -1,7 +1,7 @@
 package com.test.post.mapper;
 
-import com.test.Member.entity.DisabilityType;
-import com.test.Member.entity.Member;
+import com.test.member.entity.DisabilityType;
+import com.test.member.entity.Member;
 import com.test.post.Entity.*;
 import com.test.post.dto.*;
 

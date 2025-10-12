@@ -1,7 +1,7 @@
 package com.test.auth.config;
 
-import com.test.Member.detail.CustomUserDetails;
-import com.test.Member.entity.Member;
+import com.test.member.detail.CustomUserDetails;
+import com.test.member.entity.Member;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

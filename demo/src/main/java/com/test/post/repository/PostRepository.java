@@ -1,12 +1,8 @@
 package com.test.post.repository;
 
 
-import com.test.Member.entity.DisabilityType;
-import com.test.post.Entity.AssistanceType;
 import com.test.post.Entity.Post;
 import com.test.post.Entity.PostType;
-import com.test.post.dto.PostCustomPage;
-import com.test.post.dto.PostDetailDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -36,6 +32,10 @@ public interface PostRepository extends JpaRepository<Post,Long>{
     @Query(value = "SELECT post_status FROM post WHERE post_id = :postId", nativeQuery = true)
     String findPostStatusById(@Param("postId") Long postId);
 
+    // 내 글 전체 (타입 무관)
+    Page<Post> findByAuthor_Id(Long authorId, Pageable pageable);
+
+
     // 내가 쓴 글 조회 (Spring Data JPA 자동 생성)
-    Page<Post> findByAuthorIdAndPostType(Long memberId, PostType postType, Pageable pageable);
+    Page<Post> findByAuthor_IdAndPostType(Long memberId, PostType postType, Pageable pageable);
 }
